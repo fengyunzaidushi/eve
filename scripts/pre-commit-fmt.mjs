@@ -23,9 +23,11 @@
 
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const REPO_ROOT = resolve(new URL("..", import.meta.url).pathname);
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const OXFMT_BIN = resolve(REPO_ROOT, "node_modules", "oxfmt", "bin", "oxfmt");
 
 // Exit code `oxfmt` uses when no passed path matches a supported parser.
 const OXFMT_NO_TARGETS_EXIT = 2;
@@ -80,7 +82,7 @@ if (safe.length === 0) {
   process.exit(0);
 }
 
-const fmt = run("pnpm", ["exec", "oxfmt", "--", ...safe], {
+const fmt = run(process.execPath, [OXFMT_BIN, "--", ...safe], {
   stdio: ["ignore", "inherit", "inherit"],
 });
 if (fmt.status === OXFMT_NO_TARGETS_EXIT) {
